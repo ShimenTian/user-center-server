@@ -57,8 +57,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (userPassword.length() < 8 || checkPassword.length() < 8) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "用户密码过短");
         }
-        if (captcha.length() > 5) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "验证码编号过长");
+        if (!captcha.startsWith("1516470+")) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "邀请码错误");
         }
         // 账户不能包含特殊字符
         String validPattern = "[`~!@#$%^&*()+=|{}':;',\\\\[\\\\].<>/?~！@#￥%……&*（）——+|{}【】‘；：”“’。，、？]";
@@ -77,12 +77,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (count > 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "账号重复");
         }
-        // 验证码不能重复
+        // 邀请码不能重复
         queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("captcha", captcha);
         count = userMapper.selectCount(queryWrapper);
         if (count > 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "验证码重复");
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "邀请码重复");
         }
         // 2. 加密
         String encryptPassword = DigestUtils.md5DigestAsHex((SALT + userPassword).getBytes());
